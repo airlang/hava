@@ -1,75 +1,68 @@
-<h1>Hava</h1>
+# Hava Programming Language
 
-Hava, Python ile kodlanmış olup kolay syntax yapısı ve türkçe olması ile size kolaylık getirecek bir dildir.
-Bazı örnek kodlar;
+Hava is a simple interpreted programming language written in Python.  
+The goal of this project is to explore how programming languages are designed and executed, while providing a clean and intuitive syntax in Turkish.
 
-<h1>Fonksiyonlar</h1>
+## Motivation
 
-**Kod:**
+I built Hava to understand how programming languages work internally — not just how to use them.  
+This project focuses on concepts like parsing, execution flow, and language design.
 
-````
+## Technical Overview
+
+Hava consists of three main components:
+
+- **Lexer**: Tokenizes input using defined language rules  
+- **Parser**: Builds structured instructions based on grammar  
+- **Interpreter**: Executes instructions using a custom runtime environment  
+
+The interpreter evaluates code dynamically by walking through the parsed structure and executing operations step by step.
+
+## Features
+
+- Simple and readable syntax (Turkish-based)
+- Variables and assignments
+- Arithmetic operations (+, -, *, /)
+- Conditional statements (if / else)
+- Loops
+- Function definitions and calls
+- Interpreter-based execution
+
+## Example Code
+
+```hava
 Hava > fonksiyon test1():: hava_isim = "hava" :
 Hava > test1():
 Hava > yaz(hava_isim):
-````
+```
 
-**Sonuç**
-````
+**Output:**
+```
 hava
-````
+```
 
----------------------
-<h1>Döngüler</h1>
+## Running the Project
 
-**Kod**
-````
-Hava > i = 0:
-Hava > döngü i içinde 10 :: yaz("hava") :
-````
+Run the interpreter with:
 
-**Sonuç**
-````
-hava
-hava
-hava
-hava
-hava
-hava
-hava
-hava
-hava
-hava
-````
+```bash
+python run-interpreter.py
+```
 
----
+Then write your code in the interactive console.
 
-<h1>Koşullar</h1>
+## Notes
 
-**Kod**
+- This project is in beta and still under development  
+- Currently interpreter-based (no compiler yet)  
+- Designed as a learning-focused project  
 
-````
-Hava > i = 0:
-Hava > eğer i == 0 :: hava_isim = "hava" değilse:: hava_isim = "hava değil":
-````
+## Learning Outcome
 
-**Sonuç**
+Through this project, I gained hands-on experience with:
 
-````
-hava
-````
+- how interpreters execute code  
+- structuring a custom programming language  
+- designing syntax and execution logic  
 
---- 
-
-<h1>Notlar</h1>
-
-> Kodlarınızı denemek için "run-interpreter.py" dosyasını çalıştırmanız yeterlidir.
-
-> Compiler versiyonu çıkmamıştır, interpreter mevcuttur.
-
-> Beta sürümdedir, geliştiriliyor
-
-> Geliştirilmeye açıktır, pull request açarak geliştirebilirsiniz.
-
----
-
-<h2>- Hava Geliştirici Ekibi</h2>
+This project reflects my interest in understanding programming beyond surface-level coding.
