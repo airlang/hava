@@ -1,19 +1,3 @@
-"""
-	Author: GianC-Dev <gianegekck@gmail.com>
-					  _    _
-					 | |  | |
-					 | |__| | __ ___   ____ _
-					 |  __  |/ _` \ \ / / _` |
-					 | |  | | (_| |\ V / (_| |
-					 |_|  |_|\__,_| \_/ \__,_|
-      
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-"""
-
-
 import sys
 import inspect
 from collections import OrderedDict, defaultdict, Counter
@@ -1905,6 +1889,7 @@ class Parser(metaclass=ParserMeta):
         except GrammarError as e:
             errors += f'{e}\n'
 
+
         undefined_symbols = grammar.undefined_symbols()
         for sym, prod in undefined_symbols:
             errors += '%s:%d: Symbol %r used, but not defined as a token or a rule\n' % (prod.file, prod.line, sym)
@@ -2020,11 +2005,11 @@ class Parser(metaclass=ParserMeta):
         if token:
             lineno = getattr(token, 'lineno', 0)
             if lineno:
-                sys.stderr.write(f'Hava: {lineno} numaralı satır da Söz dizimi hatası, tip={token.type} (Geliştiriciler İçin) \n')
+                print(f'Hava: {lineno} numaralı satır da Söz dizimi hatası, token={token.type} ')
             else:
-                sys.stderr.write(f'Hava: Syntax hatası, tip={token.type} (Geliştiriciler İçin) ')
+                print(f'Hava: Syntax hatası, token={token.type}')
         else:
-            sys.stderr.write('Hava: Söz dizimi hatası\n')
+            print('Hava: Söz dizimi hatası')
  
     def errok(self):
         '''
@@ -2136,7 +2121,7 @@ class Parser(metaclass=ParserMeta):
                 # If there are any synchronization rules, they may
                 # catch it.
                 #
-                # In addition to pushing the error token, we call call
+                # In addition to pushing the error token, we call
                 # the user defined error() function if this is the
                 # first syntax error.  This function is only called if
                 # errorcount == 0.

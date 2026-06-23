@@ -163,6 +163,7 @@ class LexerMeta(type):
         cls._build()
         return cls
 
+
 class Lexer(metaclass=LexerMeta):
     # These attributes may be defined in subclasses
     tokens = set()
@@ -315,6 +316,7 @@ class Lexer(metaclass=LexerMeta):
 
         if not all(isinstance(lit, str) for lit in cls.literals):
             raise LexerBuildError('literals must be specified as strings')
+
 
     def begin(self, cls):
         '''
