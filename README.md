@@ -104,7 +104,7 @@ Output:
 
 ## Running
 
-Run the project with:
+Run the interactive console with:
 
 ```bash
 python main.py
@@ -112,7 +112,48 @@ python main.py
 
 Then write Hava code in the console.
 
-The interactive console is still simple. Single-line expressions and statements can be written directly in the console. Multi-line REPL support is still experimental.
+The interactive console is still simple. Single-line expressions and statements can be written directly in the console. Multi-line examples are usually better written in a `.hava` file. Multi-line REPL support is still experimental.
+
+### Running a file
+
+You can run a Hava file with:
+
+```bash
+python main.py --file examples/math.hava
+```
+
+Example file:
+
+```hava
+## Hava can do maths! ##
+
+number_1 = 50:
+number_2 = 80:
+
+yaz(number_1 + number_2):
+yaz(number_1 * number_2):
+yaz(number_1 - number_2):
+yaz(number_1 / number_2):
+yaz((number_1 + number_2) * 2):
+```
+
+Expected output:
+
+```text
+130
+4000
+-30
+0.625
+260
+```
+
+### Printing the AST
+
+To print the generated AST while running a file:
+
+```bash
+python main.py --file examples/math.hava --ast
+```
 
 ## Status
 Hava is still experimental.

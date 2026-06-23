@@ -1,4 +1,5 @@
 from .bytecode import OpCode, Instruction
+from .errors import HavaCompilerError
 
 
 class HavaCompiler:
@@ -25,7 +26,7 @@ class HavaCompiler:
             return None
         method = getattr(self, f"visit_{ast[0]}", None)
         if method is None:
-            raise RuntimeError(f"Bilinmeyen AST tipi: {ast[0]}")
+            raise HavaCompilerError(f"Bilinmeyen AST node tipi: {ast[0]}")
         return method(ast)
 
     def visit_program(self, ast):
@@ -76,7 +77,7 @@ class HavaCompiler:
         self.visit(right)
 
         if op not in opcodes:
-            raise RuntimeError(f"Bilinmeyen binary operatör: {op}")
+            raise HavaCompilerError(f"Bilinmeyen binary operatör: {op}")
         self.emit(opcodes[op])
 
     def visit_if(self, ast):
@@ -102,6 +103,10 @@ class HavaCompiler:
         end_index = len(self.instructions)
         self.patch(jump_to_end_index, end_index)
 
+    def visit_expr_stmt(self, ast):
+        self.visit(ast[1])
+        self.emit(OpCode.POP)
+
     def visit_aug_assign(self, ast):
         name = ast[1]
         op = ast[2]
@@ -113,5 +118,5 @@ class HavaCompiler:
         elif op == '-=':
             self.emit(OpCode.SUB)
         else:
-            raise RuntimeError(f"Bilinmeyen atama operatörü: {op}")
+            raise HavaCompilerError(f"Bilinmeyen atama operatörü: {op}")
         self.emit(OpCode.STORE_NAME, name)

@@ -1,0 +1,21 @@
+## Conditions ##
+
+score = 85:
+
+eğer score >= 50 ::
+    yaz("passed"):
+:
+
+eğer score <= 49 ::
+    yaz("failed"):
+:
+
+## If / else example ##
+
+score = 85:
+
+eğer score >= 50 ::
+    yaz("passed"):
+: değilse ::
+    yaz("failed"):
+:

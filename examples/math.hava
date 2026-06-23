@@ -1,0 +1,19 @@
+## Hava can do maths! ##
+
+number_1 = 50:
+number_2 = 80:
+
+yaz(number_1 + number_2):
+## 130 ##
+
+yaz(number_1 * number_2):
+## 4000 ##
+
+yaz(number_1 - number_2):
+## -30 ##
+
+yaz(number_1 / number_2):
+## 0.625 ##
+
+yaz((number_1 + number_2) * 2):
+## 260 ##

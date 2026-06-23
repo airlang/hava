@@ -1,5 +1,6 @@
 from .sly import Parser
 from .sly import Lexer
+from .errors import HavaLexerError, find_column, HavaParserError
 
 KEYWORDS = {
     "eğer": "IF",
@@ -41,7 +42,7 @@ OPERATORS = {
 
 
 class HavaLexer(Lexer):
-    ignore = " \t"
+    ignore = "\t "
     global KEYWORDS, OPERATORS
 
     literals = {
@@ -57,6 +58,13 @@ class HavaLexer(Lexer):
         *set(OPERATORS.values()),
         *set(KEYWORDS.values()),
     }
+
+    def __init__(self):
+        self.source = ""
+
+    @_(r"\n+")
+    def ignore_newline(self, t):
+        self.lineno += t.value.count("\n")
 
     @_(r"::|\+=|-=|==|>=|<=|:|=")
     def OPERATOR(self, t):
@@ -84,8 +92,13 @@ class HavaLexer(Lexer):
         pass
 
     def error(self, t):
-        print(f"Geçersiz karakter: {t.value[0]!r}")
-        self.index += 1
+        column = find_column(self.source, t)
+        raise HavaLexerError(
+            f"Geçersiz karakter: {t.value[0]!r}",
+            line=self.lineno,
+            column=column,
+            source=self.source,
+        )
 
 
 class HavaParser(Parser):
@@ -97,6 +110,22 @@ class HavaParser(Parser):
         ('left', '*', '/'),
         ('right', 'UMINUS'),
     )
+
+    def __init__(self):
+        self.source = ""
+
+    def error(self, p):
+        if p is None:
+            raise HavaParserError("Beklenmeyen dosya sonu", source=self.source)
+
+        column = find_column(self.source, p)
+
+        raise HavaParserError(
+            f"Beklenmeyen token: {p.type} ({p.value!r})",
+            line=p.lineno,
+            column=column,
+            source=self.source,
+        )
 
     @_('statements')
     def program(self, p):
@@ -122,13 +151,13 @@ class HavaParser(Parser):
     def statement(self, p):
         return ('print', p.expr)
 
-    @_('IF condition block')
+    @_('IF expr block')
     def statement(self, p):
-        return ('if', p.condition, p.block)
+        return ('if', p.expr, p.block)
 
-    @_('IF condition block ELSE block')
+    @_('IF expr block ELSE block')
     def statement(self, p):
-        return ('if_else', p.condition, p.block0, p.block1)
+        return ('if_else', p.expr, p.block0, p.block1)
 
     @_('FOR NAME IN expr block')
     def statement(self, p):
@@ -144,43 +173,49 @@ class HavaParser(Parser):
 
     @_('expr FINISH_PREFIX')
     def statement(self, p):
+        return ('expr_stmt', p.expr)
+
+    @_('expr EQEQ expr',
+       'expr HIGHEQ expr',
+       'expr LOWEQ expr')
+    def expr(self, p):
+        return ('binary', p[1], p.expr0, p.expr1)
+
+    @_('"(" expr ")"')
+    def expr(self, p):
         return p.expr
 
-    @_('expr EQEQ expr')
-    def condition(self, p):
-        return ('binary', '==', p.expr0, p.expr1)
-
-    @_('expr HIGHEQ expr')
-    def condition(self, p):
-        return ('binary', '>=', p.expr0, p.expr1)
-
-    @_('expr LOWEQ expr')
-    def condition(self, p):
-        return ('binary', '<=', p.expr0, p.expr1)
-
     @_('')
     def params(self, p):
         return []
+
+    @_('param_list')
+    def params(self, p):
+        return p.param_list
 
     @_('NAME')
-    def params(self, p):
+    def param_list(self, p):
         return [p.NAME]
 
-    @_('params "," NAME')
-    def params(self, p):
-        return p.params + [p.NAME]
+    @_('param_list "," NAME')
+    def param_list(self, p):
+        return p.param_list + [p.NAME]
 
     @_('')
     def args(self, p):
         return []
 
-    @_('expr')
+    @_('arg_list')
     def args(self, p):
-        return [p.expr]
+        return p.arg_list
 
-    @_('args "," expr')
-    def args(self, p):
-        return p.args + [p.expr]
+    @_('expr')
+    def arg_list(self, p):
+        return [p.NAME]
+
+    @_('arg_list "," expr')
+    def arg_list(self, p):
+        return p.arg_list + [p.NAME]
 
     @_('expr "+" expr',
        'expr "-" expr',

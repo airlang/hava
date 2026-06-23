@@ -1,0 +1,10 @@
+## Variables and reassignment ##
+
+name = "Hava":
+version = 2:
+
+yaz(name):
+yaz(version):
+
+version = version + 1:
+yaz(version):

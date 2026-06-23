@@ -1,1 +1,0 @@
-from .yorumlayici import parser

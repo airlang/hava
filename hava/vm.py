@@ -59,7 +59,6 @@ class HavaVM:
             elif op == OpCode.JUMP:
                 self.ip = arg
                 continue
-
             elif op == OpCode.JUMP_IF_FALSE:
                 condition = self.stack.pop()
                 if not condition:

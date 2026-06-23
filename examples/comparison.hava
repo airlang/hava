@@ -1,0 +1,8 @@
+## Comparison operations ##
+
+a = 10:
+b = 20:
+
+yaz(a == b):
+yaz(a <= b):
+yaz(b >= a):
