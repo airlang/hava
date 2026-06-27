@@ -48,7 +48,7 @@ class HavaLexer(Lexer):
 
     literals = {
         "+", "-", "*", "/",
-        "(", ")", ","
+        "(", ")", ",", "[", "]"
     }
 
     tokens = {
@@ -134,7 +134,7 @@ class HavaParser(Parser):
 
     @_('statements')
     def program(self, p):
-        return ('program', p.statements)
+        return 'program', p.statements
 
     @_('statement')
     def statements(self, p):
@@ -146,45 +146,73 @@ class HavaParser(Parser):
 
     @_('START_PREFIX statements FINISH_PREFIX')
     def block(self, p):
-        return ('block', p.statements)
+        return 'block', p.statements
 
     @_('NAME EQ expr FINISH_PREFIX')
     def statement(self, p):
-        return ('assign', p.NAME, p.expr)
+        return 'assign', p.NAME, p.expr
 
     @_('IF expr block')
     def statement(self, p):
-        return ('if', p.expr, p.block)
+        return 'if', p.expr, p.block
 
     @_('IF expr block ELSE block')
     def statement(self, p):
-        return ('if_else', p.expr, p.block0, p.block1)
+        return 'if_else', p.expr, p.block0, p.block1
 
     @_('FOR NAME IN expr block')
     def statement(self, p):
-        return ('for_loop', p.NAME, p.expr, p.block)
+        return 'for_loop', p.NAME, p.expr, p.block
 
     @_('FUN NAME "(" params ")" block')
     def statement(self, p):
-        return ('fun_def', p.NAME, p.params, p.block)
+        return 'fun_def', p.NAME, p.params, p.block
 
     @_('RETURN expr FINISH_PREFIX')
     def statement(self, p):
-        return ('return', p.expr)
+        return 'return', p.expr
 
     @_('expr FINISH_PREFIX')
     def statement(self, p):
-        return ('expr_stmt', p.expr)
+        return 'expr_stmt', p.expr
+
+    @_('NAME "[" expr "]" EQ expr FINISH_PREFIX')
+    def statement(self, p):
+        return 'array_index_assign', ('var', p.NAME), p.expr0, p.expr1
 
     @_('expr EQEQ expr',
        'expr HIGHEQ expr',
        'expr LOWEQ expr')
     def expr(self, p):
-        return ('binary', p[1], p.expr0, p.expr1)
+        return 'binary', p[1], p.expr0, p.expr1
+
+    @_('expr "[" expr "]"')
+    def expr(self, p):
+        return 'array_index', p.expr0, p.expr1
 
     @_('"(" expr ")"')
     def expr(self, p):
         return p.expr
+
+    @_('"[" array_elements "]"')
+    def expr(self, p):
+        return 'array', p.array_elements
+
+    @_('')
+    def array_elements(self, p):
+        return []
+
+    @_('array_element_list')
+    def array_elements(self, p):
+        return p.array_element_list
+
+    @_('expr')
+    def array_element_list(self, p):
+        return [p.expr]
+
+    @_('array_element_list "," expr')
+    def array_element_list(self, p):
+        return p.array_element_list + [p.expr]
 
     @_('')
     def params(self, p):
@@ -223,32 +251,32 @@ class HavaParser(Parser):
        'expr "*" expr',
        'expr "/" expr')
     def expr(self, p):
-        return ('binary', p[1], p.expr0, p.expr1)
+        return 'binary', p[1], p.expr0, p.expr1
 
     @_('"-" expr %prec UMINUS')
     def expr(self, p):
-        return ('neg', p.expr)
+        return 'neg', p.expr
 
     @_('NAME PLUSEQ expr FINISH_PREFIX')
     def statement(self, p):
-        return ('aug_assign', p.NAME, '+=', p.expr)
+        return 'aug_assign', p.NAME, '+=', p.expr
 
     @_('NAME MINUSEQ expr FINISH_PREFIX')
     def statement(self, p):
-        return ('aug_assign', p.NAME, '-=', p.expr)
+        return 'aug_assign', p.NAME, '-=', p.expr
 
     @_('NAME "(" args ")"')
     def expr(self, p):
-        return ('fun_call', p.NAME, p.args)
+        return 'fun_call', p.NAME, p.args
 
     @_('NAME')
     def expr(self, p):
-        return ('var', p.NAME)
+        return 'var', p.NAME
 
     @_('NUMBER')
     def expr(self, p):
-        return ('num', p.NUMBER)
+        return 'num', p.NUMBER
 
     @_('STRING')
     def expr(self, p):
-        return ('str', p.STRING)
+        return 'str', p.STRING

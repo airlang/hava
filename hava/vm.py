@@ -108,6 +108,31 @@ class HavaVM:
             elif op == OpCode.NEG:
                 value = self.stack.pop()
                 self.stack.append(-value)
+            elif op == OpCode.BUILD_ARRAY:
+                elems = [self.stack.pop() for _ in range(arg)]
+                elems.reverse()
+                self.stack.append(elems)
+            elif op == OpCode.ARRAY_INDEX:
+                index = self.stack.pop()
+                target = self.stack.pop()
+                try:
+                    self.stack.append(target[index])
+                except TypeError:
+                    raise HavaRuntimeError("Geçersiz array index kullanımı.")
+                except IndexError:
+                    raise HavaRuntimeError("Array index sınır dışında.")
+            elif op == OpCode.ARRAY_INDEX_ASSIGN:
+                array_to_assign = self.stack.pop()
+                array_index = self.stack.pop()
+                array = self.stack.pop()
+                if not isinstance(array_index, int):
+                    raise HavaRuntimeError("Array index değeri sayı olmalı.")
+                if isinstance(array_to_assign, list):
+                    raise HavaRuntimeError("Bu değer array gibi değiştirilemez.")
+                try:
+                    array[array_index] = array_to_assign
+                except IndexError:
+                    raise HavaRuntimeError("Array index sınır dışında.")
             else:
                 raise HavaRuntimeError(f"Bilinmeyen opcode: {op}")
             ip += 1

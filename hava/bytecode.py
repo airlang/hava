@@ -23,6 +23,9 @@ class OpCode(Enum):
     RETURN = auto()
     JUMP = auto()
     JUMP_IF_FALSE = auto()
+    BUILD_ARRAY = auto()
+    ARRAY_INDEX = auto()
+    ARRAY_INDEX_ASSIGN = auto()
 
 
 @dataclass

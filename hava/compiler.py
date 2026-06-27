@@ -56,6 +56,23 @@ class HavaCompiler:
         name = ast[1]
         self.emit(OpCode.LOAD_NAME, name)
 
+    def visit_array(self, ast):
+        for elem in ast[1]:
+            self.visit(elem)
+        self.emit(OpCode.BUILD_ARRAY, len(ast[1]))
+
+    def visit_array_index(self, ast):
+        self.visit(ast[1])
+        self.visit(ast[2])
+        self.emit(OpCode.ARRAY_INDEX)
+
+    def visit_array_index_assign(self, ast):
+        ast_info = {'array_name': ast[1], 'array_index': ast[2], "to_assign": ast[3]}
+        self.visit(ast_info["array_name"])
+        self.visit(ast_info["array_index"])
+        self.visit(ast_info["to_assign"])
+        self.emit(OpCode.ARRAY_INDEX_ASSIGN)
+
     def visit_assign(self, ast):
         name = ast[1]
         value = ast[2]

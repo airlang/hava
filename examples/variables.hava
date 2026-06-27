@@ -5,6 +5,17 @@ version = 2:
 
 yaz(name):
 yaz(version):
+yaz(tür(name)):
+yaz(tür(version)):
 
 version = version + 1:
 yaz(version):
+
+
+array = ["h","e","l","l","o"]:
+yaz(array[0]):
+array[0] = "y":
+yaz(array[0]):
+ekle(array, "w"):
+yaz(array):
+yaz(tür(array)):

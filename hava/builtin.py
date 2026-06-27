@@ -13,12 +13,21 @@ def hava_type(value):
         return "none"
     return type(value).__name__
 
+def hava_append(array, value):
+    if not isinstance(array, list):
+        raise TypeError("append sadece array üzerinde kullanılabilir.")
+    array.append(value)
+    return None
+
 BUILTINS = {
     "print": HavaBuiltinFunction("print", print, 1),
     "yaz": HavaBuiltinFunction("yaz", print, 1),
 
     "len": HavaBuiltinFunction("len", len, 1),
     "uzunluk": HavaBuiltinFunction("uzunluk", len, 1),
+
+    "append": HavaBuiltinFunction("append", hava_append, 2),
+    "ekle": HavaBuiltinFunction("ekle", hava_append, 2),
 
     "type": HavaBuiltinFunction("type", hava_type, 1),
     "tür": HavaBuiltinFunction("tür", hava_type, 1),
