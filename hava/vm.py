@@ -78,12 +78,12 @@ class HavaVM:
                 elif op == OpCode.POP:
                     frame.stack.pop()
                 elif op == OpCode.JUMP:
-                    ip = arg
+                    frame.ip = arg
                     continue
                 elif op == OpCode.JUMP_IF_FALSE:
                     condition = frame.stack.pop()
                     if not condition:
-                        ip = arg
+                        frame.ip = arg
                         continue
                 elif op == OpCode.CALL:
                     name, arg_count = arg
