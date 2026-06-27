@@ -1,4 +1,4 @@
-from .bytecode import OpCode, Instruction
+from .bytecode import OpCode, Instruction, HavaFunction
 from .errors import HavaCompilerError
 
 
@@ -7,6 +7,7 @@ class HavaCompiler:
         self.instructions = []
 
     def compile(self, ast):
+        self.instructions = []
         self.visit(ast)
         return self.instructions
 
@@ -103,6 +104,24 @@ class HavaCompiler:
         end_index = len(self.instructions)
         self.patch(jump_to_end_index, end_index)
 
+    def visit_fun_def(self, ast):
+        outer_instructions = self.instructions
+        self.instructions = []
+        self.visit(ast[3])
+        self.emit(OpCode.LOAD_CONST, None)
+        self.emit(OpCode.RETURN)
+        function_instructions = self.instructions
+        self.instructions = outer_instructions
+        function = HavaFunction(ast[2], function_instructions)
+        self.emit(OpCode.LOAD_CONST, function)
+        self.emit(OpCode.STORE_NAME, ast[1])
+
+    def visit_fun_call(self, ast):
+        for arg in ast[2]:
+            self.visit(arg)
+        self.emit(OpCode.CALL, (ast[1], len(ast[2])))
+        self.emit(OpCode.POP)
+
     def visit_expr_stmt(self, ast):
         self.visit(ast[1])
         self.emit(OpCode.POP)
@@ -120,3 +139,7 @@ class HavaCompiler:
         else:
             raise HavaCompilerError(f"Bilinmeyen atama operatörü: {op}")
         self.emit(OpCode.STORE_NAME, name)
+
+    def visit_neg(self, ast):
+        self.visit(ast[1])
+        self.emit(OpCode.NEG)

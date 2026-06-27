@@ -1,24 +1,23 @@
-from .bytecode import OpCode
+from .bytecode import OpCode, HavaFunction
+from .errors import HavaRuntimeError
 
 
 class HavaVM:
     def __init__(self):
         self.stack = []
         self.env = {}
-        self.ip = 0
 
     def run(self, instructions):
-        self.ip = 0
-
-        while self.ip < len(instructions):
-            op = instructions[self.ip].op
-            arg = instructions[self.ip].arg
+        ip = 0
+        while ip < len(instructions):
+            op = instructions[ip].op
+            arg = instructions[ip].arg
 
             if op == OpCode.LOAD_CONST:
                 self.stack.append(arg)
             elif op == OpCode.LOAD_NAME:
                 if arg not in self.env:
-                    raise RuntimeError(f"Bilinmeyen değişken: {arg}")
+                    raise HavaRuntimeError(f"Bilinmeyen değişken: {arg}")
                 self.stack.append(self.env[arg])
             elif op == OpCode.STORE_NAME:
                 value = self.stack.pop()
@@ -57,14 +56,41 @@ class HavaVM:
             elif op == OpCode.POP:
                 self.stack.pop()
             elif op == OpCode.JUMP:
-                self.ip = arg
+                ip = arg
                 continue
             elif op == OpCode.JUMP_IF_FALSE:
                 condition = self.stack.pop()
                 if not condition:
-                    self.ip = arg
+                    ip = arg
                     continue
+            elif op == OpCode.CALL:
+                name, arg_count = arg
+                args = [self.stack.pop() for _ in range(arg_count)]
+                args.reverse()
+                if name not in self.env:
+                    raise HavaRuntimeError(f"Bilinmeyen fonksiyon: {name}")
+                fn = self.env[name]
+                if not isinstance(fn, HavaFunction):
+                    raise HavaRuntimeError(f"{name} bir fonksiyon değil")
+                if len(fn.params) != len(args):
+                    raise HavaRuntimeError(
+                        f"{name} fonksiyonu {len(fn.params)} argüman bekliyor, "
+                        f"{len(args)} verildi."
+                    )
+                old_env = self.env.copy()
+                for param_name, arg_value in zip(fn.params, args):
+                    self.env[param_name] = arg_value
+                result = self.run(fn.instructions)
+                self.env = old_env
+                self.stack.append(result)
+            elif op == OpCode.RETURN:
+                if self.stack:
+                    return self.stack.pop()
+                return None
+            elif op == OpCode.NEG:
+                value = self.stack.pop()
+                self.stack.append(-value)
             else:
-                raise RuntimeError(f"Bilinmeyen opcode: {op}")
+                raise HavaRuntimeError(f"Bilinmeyen opcode: {op}")
 
-            self.ip += 1
+            ip += 1

@@ -1,0 +1,19 @@
+## Functions ##
+
+fonksiyon test_func() ::
+    yaz("Hello World"):
+:
+
+test_func():
+
+
+## Functions with params ##
+
+fonksiyon test_func_with_params(a, b) ::
+    yaz(a + b):
+:
+
+test_func_with_params(5, 10):
+test_func_with_params(5, 10 + 3):
+test_func_with_params((10 / 2) + 5, 8):
+test_func_with_params("Hello ", "World"):

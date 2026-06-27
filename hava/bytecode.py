@@ -15,6 +15,9 @@ class OpCode(Enum):
     SUB = auto()
     MUL = auto()
     DIV = auto()
+    NEG = auto()
+    CALL = auto()
+    RETURN = auto()
     JUMP = auto()
     JUMP_IF_FALSE = auto()
 
@@ -23,3 +26,8 @@ class OpCode(Enum):
 class Instruction:
     op: OpCode
     arg: object = None
+
+@dataclass
+class HavaFunction:
+    params: list
+    instructions: list

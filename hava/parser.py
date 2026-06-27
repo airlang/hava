@@ -106,6 +106,7 @@ class HavaParser(Parser):
     start = 'program'
 
     precedence = (
+        ('nonassoc', 'EQEQ', 'HIGHEQ', 'LOWEQ'),
         ('left', '+', '-'),
         ('left', '*', '/'),
         ('right', 'UMINUS'),
@@ -211,11 +212,11 @@ class HavaParser(Parser):
 
     @_('expr')
     def arg_list(self, p):
-        return [p.NAME]
+        return [p.expr]
 
     @_('arg_list "," expr')
     def arg_list(self, p):
-        return p.arg_list + [p.NAME]
+        return p.arg_list + [p.expr]
 
     @_('expr "+" expr',
        'expr "-" expr',
