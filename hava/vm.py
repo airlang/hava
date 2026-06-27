@@ -1,11 +1,12 @@
-from .bytecode import OpCode, HavaFunction
+from .builtin import BUILTINS
+from .bytecode import OpCode, HavaFunction, HavaBuiltinFunction
 from .errors import HavaRuntimeError
 
 
 class HavaVM:
     def __init__(self):
         self.stack = []
-        self.env = {}
+        self.env = BUILTINS.copy()
 
     def run(self, instructions):
         ip = 0
@@ -19,6 +20,10 @@ class HavaVM:
                     raise HavaRuntimeError(f"Bilinmeyen değişken: {arg}")
                 self.stack.append(self.env[arg])
             elif op == OpCode.STORE_NAME:
+                if arg in set(BUILTINS.keys()):
+                    raise HavaRuntimeError(
+                        f"{arg!r} yerleşik bir fonksiyon adı olduğu için değiştirilemez."
+                    )
                 value = self.stack.pop()
                 self.env[arg] = value
             elif op == OpCode.ADD:
@@ -69,21 +74,33 @@ class HavaVM:
                 if name not in self.env:
                     raise HavaRuntimeError(f"Bilinmeyen fonksiyon: {name}")
                 fn = self.env[name]
-                if not isinstance(fn, HavaFunction):
+                if isinstance(fn, HavaBuiltinFunction):
+                    if fn.params is not None and fn.params != len(args):
+                        raise HavaRuntimeError(
+                            f"{name} fonksiyonu {fn.params} argüman bekliyor, "
+                            f"{len(args)} verildi."
+                        )
+                    try:
+                        result = fn.func(*args)
+                    except Exception as e:
+                        raise HavaRuntimeError(f"{name} çalışırken hata oluştu: {e}")
+                    self.stack.append(result)
+                elif isinstance(fn, HavaFunction):
+                    if len(fn.params) != len(args):
+                        raise HavaRuntimeError(
+                            f"{name} fonksiyonu {len(fn.params)} argüman bekliyor, "
+                            f"{len(args)} verildi."
+                        )
+                    old_env = self.env.copy()
+                    try:
+                        for param_name, arg_value in zip(fn.params, args):
+                            self.env[param_name] = arg_value
+                        result = self.run(fn.instructions)
+                    finally:
+                        self.env = old_env
+                    self.stack.append(result)
+                else:
                     raise HavaRuntimeError(f"{name} bir fonksiyon değil")
-                if len(fn.params) != len(args):
-                    raise HavaRuntimeError(
-                        f"{name} fonksiyonu {len(fn.params)} argüman bekliyor, "
-                        f"{len(args)} verildi."
-                    )
-                old_env = self.env.copy()
-                try:
-                    for param_name, arg_value in zip(fn.params, args):
-                        self.env[param_name] = arg_value
-                    result = self.run(fn.instructions)
-                finally:
-                    self.env = old_env
-                self.stack.append(result)
             elif op == OpCode.RETURN:
                 if self.stack:
                     return self.stack.pop()

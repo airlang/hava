@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import Callable
 
 
 class OpCode(Enum):
@@ -31,3 +34,9 @@ class Instruction:
 class HavaFunction:
     params: list
     instructions: list
+
+@dataclass
+class HavaBuiltinFunction:
+    name: str
+    func: Callable
+    params: int | None = None

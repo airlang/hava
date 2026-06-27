@@ -1,6 +1,12 @@
+from .builtin import BUILTINS
 from .bytecode import OpCode, Instruction, HavaFunction
 from .errors import HavaCompilerError
 
+def ensure_not_builtin_name(name):
+    if name in set(BUILTINS.keys()):
+        raise HavaCompilerError(
+            f"{name!r} yerleşik bir fonksiyon adı olduğu için kullanılamaz."
+        )
 
 class HavaCompiler:
     def __init__(self):
@@ -53,6 +59,7 @@ class HavaCompiler:
     def visit_assign(self, ast):
         name = ast[1]
         value = ast[2]
+        ensure_not_builtin_name(name)
         self.visit(value)
         self.emit(OpCode.STORE_NAME, name)
 
@@ -105,6 +112,9 @@ class HavaCompiler:
         self.patch(jump_to_end_index, end_index)
 
     def visit_fun_def(self, ast):
+        ensure_not_builtin_name(ast[1])
+        for param in ast[2]:
+            ensure_not_builtin_name(param)
         outer_instructions = self.instructions
         self.instructions = []
         self.visit(ast[3])
@@ -133,6 +143,7 @@ class HavaCompiler:
         name = ast[1]
         op = ast[2]
         value = ast[3]
+        ensure_not_builtin_name(name)
         self.emit(OpCode.LOAD_NAME, name)
         self.visit(value)
         if op == '+=':

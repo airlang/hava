@@ -17,3 +17,9 @@ yaz(number_1 / number_2):
 
 yaz((number_1 + number_2) * 2):
 ## 260 ##
+
+yaz(max(1,2,7)):
+## 7 ##
+
+yaz(min(1,2,7)):
+## 1 ##

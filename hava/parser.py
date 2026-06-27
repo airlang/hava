@@ -23,9 +23,6 @@ KEYWORDS = {
     "icinde": "IN",
     "in": "IN",
 
-    "yaz": "PRINT",
-    "print": "PRINT",
-
     "dondur": "RETURN",
     "döndür": "RETURN",
     "return": "RETURN",
@@ -151,10 +148,6 @@ class HavaParser(Parser):
     @_('NAME EQ expr FINISH_PREFIX')
     def statement(self, p):
         return ('assign', p.NAME, p.expr)
-
-    @_('PRINT "(" expr ")" FINISH_PREFIX')
-    def statement(self, p):
-        return ('print', p.expr)
 
     @_('IF expr block')
     def statement(self, p):
