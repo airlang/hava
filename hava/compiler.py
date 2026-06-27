@@ -112,25 +112,22 @@ class HavaCompiler:
         self.emit(opcodes[op])
 
     def visit_if(self, ast):
-        condition = ast[1]
-        then_block = ast[2]
-        self.visit(condition)
+        ast_info = {"condition": ast[1], "then_block": ast[2]}
+        self.visit(ast_info["condition"])
         jump_if_false_index = self.emit(OpCode.JUMP_IF_FALSE, None)
-        self.visit(then_block)
+        self.visit(ast_info["then_block"])
         end_index = len(self.instructions)
         self.patch(jump_if_false_index, end_index)
 
     def visit_if_else(self, ast):
-        condition = ast[1]
-        then_block = ast[2]
-        else_block = ast[3]
-        self.visit(condition)
+        ast_info = {"condition": ast[1], "then_block": ast[2], "else_block": ast[3]}
+        self.visit(ast_info["condition"])
         jump_to_else_index = self.emit(OpCode.JUMP_IF_FALSE, None)
-        self.visit(then_block)
+        self.visit(ast_info["then_block"])
         jump_to_end_index = self.emit(OpCode.JUMP, None)
         else_index = len(self.instructions)
         self.patch(jump_to_else_index, else_index)
-        self.visit(else_block)
+        self.visit(ast_info["else_block"])
         end_index = len(self.instructions)
         self.patch(jump_to_end_index, end_index)
 

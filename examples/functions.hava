@@ -25,3 +25,12 @@ fonksiyon example_return_func() ::
 :
 
 yaz(example_return_func()):
+
+fonksiyon add(a, b) ::
+    return a + b:
+:
+
+result = add(5, 7):
+
+yaz(result):
+yaz(add(10, 20)):
