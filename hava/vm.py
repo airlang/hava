@@ -108,31 +108,40 @@ class HavaVM:
             elif op == OpCode.NEG:
                 value = self.stack.pop()
                 self.stack.append(-value)
-            elif op == OpCode.BUILD_ARRAY:
-                elems = [self.stack.pop() for _ in range(arg)]
-                elems.reverse()
-                self.stack.append(elems)
-            elif op == OpCode.ARRAY_INDEX:
+            elif op == OpCode.INDEX:
                 index = self.stack.pop()
                 target = self.stack.pop()
                 try:
                     self.stack.append(target[index])
+                except KeyError:
+                    raise HavaRuntimeError("Dict içinde bu key bulunamadı.")
+                except IndexError:
+                    raise HavaRuntimeError("Index sınır dışında.")
                 except TypeError:
-                    raise HavaRuntimeError("Geçersiz array index kullanımı.")
-                except IndexError:
-                    raise HavaRuntimeError("Array index sınır dışında.")
-            elif op == OpCode.ARRAY_INDEX_ASSIGN:
-                array_to_assign = self.stack.pop()
-                array_index = self.stack.pop()
-                array = self.stack.pop()
-                if not isinstance(array_index, int):
-                    raise HavaRuntimeError("Array index değeri sayı olmalı.")
-                if isinstance(array_to_assign, list):
-                    raise HavaRuntimeError("Bu değer array gibi değiştirilemez.")
+                    raise HavaRuntimeError("Bu değer indexlenemez.")
+            elif op == OpCode.BUILD_ARRAY:
+                elems = [self.stack.pop() for _ in range(arg)]
+                elems.reverse()
+                self.stack.append(elems)
+            elif op == OpCode.INDEX_ASSIGN:
+                value = self.stack.pop()
+                index = self.stack.pop()
+                target = self.stack.pop()
+                if not isinstance(target, (list, dict)):
+                    raise HavaRuntimeError("Sadece array veya dict üzerinde index assignment yapılabilir.")
                 try:
-                    array[array_index] = array_to_assign
+                    target[index] = value
                 except IndexError:
                     raise HavaRuntimeError("Array index sınır dışında.")
+                except TypeError:
+                    raise HavaRuntimeError("Geçersiz index/key değeri.")
+            elif op == OpCode.BUILD_DICT:
+                result = {}
+                for _ in range(arg):
+                    value = self.stack.pop()
+                    key = self.stack.pop()
+                    result[key] = value
+                self.stack.append(result)
             else:
                 raise HavaRuntimeError(f"Bilinmeyen opcode: {op}")
             ip += 1

@@ -39,6 +39,7 @@ OPERATORS = {
     "<=": "LOWEQ",
 
     "=": "EQ",
+    "=>": "FATARROW",
 }
 
 
@@ -48,7 +49,7 @@ class HavaLexer(Lexer):
 
     literals = {
         "+", "-", "*", "/",
-        "(", ")", ",", "[", "]"
+        "(", ")", ",", "[", "]","{","}"
     }
 
     tokens = {
@@ -67,7 +68,7 @@ class HavaLexer(Lexer):
     def ignore_newline(self, t):
         self.lineno += t.value.count("\n")
 
-    @_(r"::|\+=|-=|==|>=|<=|:|=")
+    @_(r"::|=>|\+=|-=|==|>=|<=|:|=")
     def OPERATOR(self, t):
         t.type = OPERATORS[t.value]
         return t
@@ -176,9 +177,9 @@ class HavaParser(Parser):
     def statement(self, p):
         return 'expr_stmt', p.expr
 
-    @_('NAME "[" expr "]" EQ expr FINISH_PREFIX')
+    @_('expr "[" expr "]" EQ expr FINISH_PREFIX')
     def statement(self, p):
-        return 'array_index_assign', ('var', p.NAME), p.expr0, p.expr1
+        return 'index_assign', p.expr0, p.expr1, p.expr2
 
     @_('expr EQEQ expr',
        'expr HIGHEQ expr',
@@ -188,11 +189,35 @@ class HavaParser(Parser):
 
     @_('expr "[" expr "]"')
     def expr(self, p):
-        return 'array_index', p.expr0, p.expr1
+        return 'index', p.expr0, p.expr1
 
     @_('"(" expr ")"')
     def expr(self, p):
         return p.expr
+
+    @_('"{" dict_entries "}"')
+    def expr(self, p):
+        return 'dict', p.dict_entries
+
+    @_('')
+    def dict_entries(self, p):
+        return []
+
+    @_('dict_pair_list')
+    def dict_entries(self, p):
+        return p.dict_pair_list
+
+    @_('dict_pair')
+    def dict_pair_list(self, p):
+        return [p.dict_pair]
+
+    @_('dict_pair_list "," dict_pair')
+    def dict_pair_list(self, p):
+        return p.dict_pair_list + [p.dict_pair]
+
+    @_('STRING FATARROW expr')
+    def dict_pair(self, p):
+        return ('str', p.STRING), p.expr
 
     @_('"[" array_elements "]"')
     def expr(self, p):

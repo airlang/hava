@@ -1,4 +1,4 @@
-## Variables and reassignment ##
+## Variables, arrays and dictionaries ##
 
 name = "Hava":
 version = 2:
@@ -11,11 +11,21 @@ yaz(tür(version)):
 version = version + 1:
 yaz(version):
 
-
 array = ["h","e","l","l","o"]:
-yaz(array[0]):
+yaz(array):
 array[0] = "y":
-yaz(array[0]):
+yaz(array):
 ekle(array, "w"):
 yaz(array):
+çıkar(array, 0):
+yaz(array):
 yaz(tür(array)):
+
+user = {
+    "address" => {
+        "city" => "Ankara"
+    }
+}:
+yaz(user["address"]["city"]):
+user["address"]["city"] = "İstanbul":
+yaz(user["address"]["city"]):

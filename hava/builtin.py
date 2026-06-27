@@ -1,4 +1,6 @@
 from .bytecode import HavaBuiltinFunction
+from .errors import HavaRuntimeError
+
 
 def hava_type(value):
     if isinstance(value, bool):
@@ -19,6 +21,26 @@ def hava_append(array, value):
     array.append(value)
     return None
 
+def hava_pop(target, key):
+    if not isinstance(target, (list, dict)):
+        raise HavaRuntimeError("pop sadece array veya dict üzerinde kullanılabilir.")
+    if isinstance(target, list):
+        if type(key) is not int:
+            raise HavaRuntimeError("Array index değeri integer olmalı.")
+        try:
+            return target.pop(key)
+        except IndexError:
+            raise HavaRuntimeError("Array index sınır dışında.")
+    if isinstance(target, dict):
+        try:
+            return target.pop(key)
+        except KeyError:
+            raise HavaRuntimeError("Dict içinde bu key bulunamadı.")
+        except TypeError:
+            raise HavaRuntimeError("Dict key değeri geçersiz.")
+    return None
+
+
 BUILTINS = {
     "print": HavaBuiltinFunction("print", print, 1),
     "yaz": HavaBuiltinFunction("yaz", print, 1),
@@ -28,6 +50,10 @@ BUILTINS = {
 
     "append": HavaBuiltinFunction("append", hava_append, 2),
     "ekle": HavaBuiltinFunction("ekle", hava_append, 2),
+
+    "pop": HavaBuiltinFunction("pop", hava_pop, 2),
+    "çıkar": HavaBuiltinFunction("çıkar", hava_pop, 2),
+    "cikar": HavaBuiltinFunction("cikar", hava_pop, 2),
 
     "type": HavaBuiltinFunction("type", hava_type, 1),
     "tür": HavaBuiltinFunction("tür", hava_type, 1),
