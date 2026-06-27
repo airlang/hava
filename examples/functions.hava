@@ -17,3 +17,11 @@ test_func_with_params(5, 10):
 test_func_with_params(5, 10 + 3):
 test_func_with_params((10 / 2) + 5, 8):
 test_func_with_params("Hello ", "World"):
+
+## Return statements ##
+
+fonksiyon example_return_func() ::
+    return "Hello World":
+:
+
+yaz(example_return_func()):

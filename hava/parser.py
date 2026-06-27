@@ -25,6 +25,10 @@ KEYWORDS = {
 
     "yaz": "PRINT",
     "print": "PRINT",
+
+    "dondur": "RETURN",
+    "döndür": "RETURN",
+    "return": "RETURN",
 }
 OPERATORS = {
     "::": "START_PREFIX",
@@ -168,9 +172,9 @@ class HavaParser(Parser):
     def statement(self, p):
         return ('fun_def', p.NAME, p.params, p.block)
 
-    @_('NAME "(" args ")" FINISH_PREFIX')
+    @_('RETURN expr FINISH_PREFIX')
     def statement(self, p):
-        return ('fun_call', p.NAME, p.args)
+        return ('return', p.expr)
 
     @_('expr FINISH_PREFIX')
     def statement(self, p):
@@ -229,13 +233,17 @@ class HavaParser(Parser):
     def expr(self, p):
         return ('neg', p.expr)
 
-    @_('NAME PLUSEQ expr')
-    def expr(self, p):
+    @_('NAME PLUSEQ expr FINISH_PREFIX')
+    def statement(self, p):
         return ('aug_assign', p.NAME, '+=', p.expr)
 
-    @_('NAME MINUSEQ expr')
-    def expr(self, p):
+    @_('NAME MINUSEQ expr FINISH_PREFIX')
+    def statement(self, p):
         return ('aug_assign', p.NAME, '-=', p.expr)
+
+    @_('NAME "(" args ")"')
+    def expr(self, p):
+        return ('fun_call', p.NAME, p.args)
 
     @_('NAME')
     def expr(self, p):

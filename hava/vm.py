@@ -12,7 +12,6 @@ class HavaVM:
         while ip < len(instructions):
             op = instructions[ip].op
             arg = instructions[ip].arg
-
             if op == OpCode.LOAD_CONST:
                 self.stack.append(arg)
             elif op == OpCode.LOAD_NAME:
@@ -78,10 +77,12 @@ class HavaVM:
                         f"{len(args)} verildi."
                     )
                 old_env = self.env.copy()
-                for param_name, arg_value in zip(fn.params, args):
-                    self.env[param_name] = arg_value
-                result = self.run(fn.instructions)
-                self.env = old_env
+                try:
+                    for param_name, arg_value in zip(fn.params, args):
+                        self.env[param_name] = arg_value
+                    result = self.run(fn.instructions)
+                finally:
+                    self.env = old_env
                 self.stack.append(result)
             elif op == OpCode.RETURN:
                 if self.stack:
@@ -92,5 +93,4 @@ class HavaVM:
                 self.stack.append(-value)
             else:
                 raise HavaRuntimeError(f"Bilinmeyen opcode: {op}")
-
             ip += 1

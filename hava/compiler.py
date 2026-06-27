@@ -120,11 +120,14 @@ class HavaCompiler:
         for arg in ast[2]:
             self.visit(arg)
         self.emit(OpCode.CALL, (ast[1], len(ast[2])))
-        self.emit(OpCode.POP)
 
     def visit_expr_stmt(self, ast):
         self.visit(ast[1])
         self.emit(OpCode.POP)
+
+    def visit_return(self, ast):
+        self.visit(ast[1])
+        self.emit(OpCode.RETURN)
 
     def visit_aug_assign(self, ast):
         name = ast[1]
