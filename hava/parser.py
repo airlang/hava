@@ -77,9 +77,12 @@ class HavaLexer(Lexer):
         t.value = t.value[1:-1]
         return t
 
-    @_(r"\d+")
+    @_(r"\d+\.\d+|\d+")
     def NUMBER(self, t):
-        t.value = int(t.value)
+        if "." in t.value:
+            t.value = float(t.value)
+        else:
+            t.value = int(t.value)
         return t
 
     @_(r"[a-zA-ZğüşöçıİĞÜŞÖÇ_][a-zA-Z0-9ğüşöçıİĞÜŞÖÇ_]*")
