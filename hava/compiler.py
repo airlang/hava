@@ -106,10 +106,21 @@ class HavaCompiler:
         right = ast[3]
         self.visit(left)
         self.visit(right)
-
         if op not in opcodes:
             raise HavaCompilerError(f"Bilinmeyen binary operatör: {op}")
         self.emit(opcodes[op])
+
+    def visit_for_loop(self, ast):
+        ast_info = {"iter_key": ast[1], "iter_items": ast[2], "block": ast[3]}
+        self.visit(ast_info["iter_items"])
+        self.emit(OpCode.GET_ITER)
+        loop_start_index = len(self.instructions)
+        for_iter_index = self.emit(OpCode.FOR_ITER)
+        self.emit(OpCode.STORE_NAME, ast_info["iter_key"])
+        self.visit(ast_info["block"])
+        self.emit(OpCode.JUMP, loop_start_index)
+        end_index = len(self.instructions)
+        self.patch(for_iter_index, end_index)
 
     def visit_if(self, ast):
         ast_info = {"condition": ast[1], "then_block": ast[2]}

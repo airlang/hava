@@ -27,6 +27,8 @@ class OpCode(Enum):
     BUILD_ARRAY = auto()
     INDEX_ASSIGN = auto()
     BUILD_DICT = auto()
+    GET_ITER = auto()
+    FOR_ITER = auto()
 
 
 @dataclass
@@ -38,6 +40,7 @@ class Instruction:
 class HavaFunction:
     params: list
     instructions: list
+
 
 @dataclass
 class HavaBuiltinFunction:

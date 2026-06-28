@@ -160,6 +160,20 @@ class HavaVM:
                         key = frame.stack.pop()
                         result[key] = value
                     frame.stack.append(result)
+                elif op == OpCode.GET_ITER:
+                    iter_items = frame.stack.pop()
+                    try:
+                        frame.stack.append(iter(iter_items))
+                    except TypeError:
+                        raise HavaRuntimeError("Bu değer üzerinde döngü kurulamaz.")
+                elif op == OpCode.FOR_ITER:
+                    iterator = frame.stack[-1]
+                    try:
+                        frame.stack.append(next(iterator))
+                    except StopIteration:
+                        frame.stack.pop()
+                        frame.ip = arg
+                        continue
                 else:
                     raise HavaRuntimeError(f"Bilinmeyen opcode: {op}")
                 frame.ip += 1
