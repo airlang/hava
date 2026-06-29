@@ -1,0 +1,30 @@
+## Text file IO examples ##
+
+## Write text to a file ##
+dosya_yaz("hava_output.txt", "Hello from Hava"):
+
+## Check if the file exists ##
+eğer dosya_var_mi("hava_output.txt") ::
+    yaz("file exists"):
+:
+değilse ::
+    yaz("file does not exist"):
+:
+
+## Read text from a file ##
+content = dosya_oku("hava_output.txt"):
+yaz(content):
+
+## English aliases ##
+write_file("hava_english_output.txt", "This was written with write_file"):
+eğer file_exists("hava_english_output.txt") ::
+    text = read_file("hava_english_output.txt"):
+    yaz(text):
+:
+
+## Reading a Hava source file as text ##
+eğer dosya_var_mi("examples/math.hava") ::
+    source = dosya_oku("examples/math.hava"):
+    yaz("examples/math.hava content:"):
+    yaz(source):
+:

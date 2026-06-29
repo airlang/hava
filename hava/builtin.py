@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from .bytecode import HavaBuiltinFunction
 from .errors import HavaRuntimeError
 
@@ -40,6 +42,31 @@ def hava_pop(target, key):
             raise HavaRuntimeError("Dict key değeri geçersiz.")
     return None
 
+def hava_read_file(path):
+    if not isinstance(path, str):
+        raise HavaRuntimeError("read_file path değeri string olmalı.")
+    try:
+        return Path(path).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        raise HavaRuntimeError(f"Dosya bulunamadı: {path}")
+    except OSError as e:
+        raise HavaRuntimeError(f"Dosya okunamadı: {e}")
+
+def hava_write_file(path, content):
+    if not isinstance(path, str):
+        raise HavaRuntimeError("write_file path değeri string olmalı.")
+    if not isinstance(content, str):
+        raise HavaRuntimeError("write_file content değeri string olmalı.")
+    try:
+        Path(path).write_text(content, encoding="utf-8")
+    except OSError as e:
+        raise HavaRuntimeError(f"Dosya yazılamadı: {e}")
+    return None
+
+def hava_file_exists(path):
+    if not isinstance(path, str):
+        raise HavaRuntimeError("file_exists path değeri string olmalı.")
+    return Path(path).exists()
 
 BUILTINS = {
     "print": HavaBuiltinFunction("print", print, 1),
@@ -78,4 +105,13 @@ BUILTINS = {
 
     "pow": HavaBuiltinFunction("pow", pow, 2),
     "üs": HavaBuiltinFunction("üs", pow, 2),
+
+    "read_file": HavaBuiltinFunction("read_file", hava_read_file, 1),
+    "dosya_oku": HavaBuiltinFunction("dosya_oku", hava_read_file, 1),
+
+    "write_file": HavaBuiltinFunction("write_file", hava_write_file, 2),
+    "dosya_yaz": HavaBuiltinFunction("dosya_yaz", hava_write_file, 2),
+
+    "file_exists": HavaBuiltinFunction("file_exists", hava_file_exists, 1),
+    "dosya_var_mi": HavaBuiltinFunction("dosya_var_mi", hava_file_exists, 1),
 }
