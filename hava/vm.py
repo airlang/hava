@@ -67,6 +67,18 @@ class HavaVM:
                     b = frame.stack.pop()
                     a = frame.stack.pop()
                     frame.stack.append(a == b)
+                elif op == OpCode.GT:
+                    b = frame.stack.pop()
+                    a = frame.stack.pop()
+                    frame.stack.append(a > b)
+                elif op == OpCode.LT:
+                    b = frame.stack.pop()
+                    a = frame.stack.pop()
+                    frame.stack.append(a < b)
+                elif op == OpCode.NEQ:
+                    b = frame.stack.pop()
+                    a = frame.stack.pop()
+                    frame.stack.append(a != b)
                 elif op == OpCode.GTE:
                     b = frame.stack.pop()
                     a = frame.stack.pop()

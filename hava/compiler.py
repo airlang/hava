@@ -97,7 +97,10 @@ class HavaCompiler:
             '-': OpCode.SUB,
             '*': OpCode.MUL,
             '/': OpCode.DIV,
+            '>': OpCode.GT,
+            '<': OpCode.LT,
             '==': OpCode.EQ,
+            '!=': OpCode.NEQ,
             '>=': OpCode.GTE,
             '<=': OpCode.LTE,
         }
@@ -109,6 +112,22 @@ class HavaCompiler:
         if op not in opcodes:
             raise HavaCompilerError(f"Bilinmeyen binary operatör: {op}")
         self.emit(opcodes[op])
+
+    def visit_bool(self, ast):
+        self.emit(OpCode.LOAD_CONST, ast[1])
+
+    def visit_null(self, ast):
+        self.emit(OpCode.LOAD_CONST, None)
+
+    def visit_while(self, ast):
+        ast_info = {'condition': ast[1], 'while_block': ast[2]}
+        loop_start_index = len(self.instructions)
+        self.visit(ast_info["condition"])
+        jump_end_index = self.emit(OpCode.JUMP_IF_FALSE, None)
+        self.visit(ast_info["while_block"])
+        self.emit(OpCode.JUMP, loop_start_index)
+        end_index = len(self.instructions)
+        self.patch(jump_end_index, end_index)
 
     def visit_for_loop(self, ast):
         ast_info = {"iter_key": ast[1], "iter_items": ast[2], "block": ast[3]}

@@ -29,3 +29,11 @@ user = {
 yaz(user["address"]["city"]):
 user["address"]["city"] = "İstanbul":
 yaz(user["address"]["city"]):
+
+a = true:
+b = false:
+c = null:
+
+yaz(a):
+yaz(b):
+yaz(c):

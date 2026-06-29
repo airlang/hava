@@ -1,6 +1,14 @@
 from .sly import Parser
 from .sly import Lexer
 from .errors import HavaLexerError, find_column, HavaParserError
+from typing import TYPE_CHECKING, Callable, TypeVar
+
+if TYPE_CHECKING:
+    fn = TypeVar("fn", bound=Callable[..., object])
+    def _(*rules: str) -> Callable[[fn], fn]:
+        def decorator(func: fn) -> fn:
+            return func
+        return decorator
 
 KEYWORDS = {
     "eğer": "IF",
@@ -15,6 +23,9 @@ KEYWORDS = {
     "dongu": "FOR",
     "for": "FOR",
 
+    "iken": "WHILE",
+    "while": "WHILE",
+
     "fonksiyon": "FUN",
     "function": "FUN",
     "fun": "FUN",
@@ -26,6 +37,20 @@ KEYWORDS = {
     "dondur": "RETURN",
     "döndür": "RETURN",
     "return": "RETURN",
+
+    "dogru": "TRUE",
+    "doğru": "TRUE",
+    "true": "TRUE",
+
+    "yanlis": "FALSE",
+    "yanlış": "FALSE",
+    "yanliş": "FALSE",
+    "false": "FALSE",
+
+    "boş": "NULL",
+    "bos": "NULL",
+    "null": "NULL",
+    "none": "NULL",
 }
 OPERATORS = {
     "::": "START_PREFIX",
@@ -35,10 +60,13 @@ OPERATORS = {
     "-=": "MINUSEQ",
 
     "==": "EQEQ",
+    "!=": "NEQ",
     ">=": "HIGHEQ",
     "<=": "LOWEQ",
 
     "=": "EQ",
+    ">": "GT",
+    "<": "LT",
     "=>": "FATARROW",
 }
 
@@ -68,7 +96,7 @@ class HavaLexer(Lexer):
     def ignore_newline(self, t):
         self.lineno += t.value.count("\n")
 
-    @_(r"::|=>|\+=|-=|==|>=|<=|:|=")
+    @_(r"::|=>|\+=|-=|==|!=|>=|<=|:|=|>|<")
     def OPERATOR(self, t):
         t.type = OPERATORS[t.value]
         return t
@@ -111,7 +139,7 @@ class HavaParser(Parser):
     start = 'program'
 
     precedence = (
-        ('nonassoc', 'EQEQ', 'HIGHEQ', 'LOWEQ'),
+        ('nonassoc', 'EQEQ','NEQ','HIGHEQ', 'LOWEQ'),
         ('left', '+', '-'),
         ('left', '*', '/'),
         ('right', 'UMINUS'),
@@ -165,6 +193,10 @@ class HavaParser(Parser):
     def statement(self, p):
         return 'for_loop', p.NAME, p.expr, p.block
 
+    @_('WHILE expr block')
+    def statement(self, p):
+        return 'while', p.expr, p.block
+
     @_('FUN NAME "(" params ")" block')
     def statement(self, p):
         return 'fun_def', p.NAME, p.params, p.block
@@ -182,6 +214,9 @@ class HavaParser(Parser):
         return 'index_assign', p.expr0, p.expr1, p.expr2
 
     @_('expr EQEQ expr',
+       'expr NEQ expr',
+       'expr GT expr',
+       'expr LT expr',
        'expr HIGHEQ expr',
        'expr LOWEQ expr')
     def expr(self, p):
@@ -293,6 +328,18 @@ class HavaParser(Parser):
     @_('NAME "(" args ")"')
     def expr(self, p):
         return 'fun_call', p.NAME, p.args
+
+    @_('TRUE')
+    def expr(self, p):
+        return 'bool', True
+
+    @_('FALSE')
+    def expr(self, p):
+        return 'bool', False
+
+    @_('NULL')
+    def expr(self, p):
+        return 'null', None
 
     @_('NAME')
     def expr(self, p):
