@@ -1,0 +1,119 @@
+## String helpers ##
+
+fonksiyon karakter_mi(value) ::
+    eğer tür(value) != "string" ::
+        döndür false:
+    :
+    eğer uzunluk(value) != 1 ::
+        döndür false:
+    :
+    döndür true:
+:
+
+fonksiyon rakam_mı(char) ::
+    eğer karakter_mi(char) != true ::
+        döndür false:
+    :
+    eğer char >= "0" ::
+        eğer char <= "9" ::
+            döndür true:
+        :
+    :
+    döndür false:
+:
+
+fonksiyon kucuk_harf_mi(char) ::
+    eğer karakter_mi(char) != true ::
+        döndür false:
+    :
+    eğer char >= "a" ::
+        eğer char <= "z" ::
+            döndür true:
+        :
+    :
+    döndür false:
+:
+
+
+fonksiyon buyuk_harf_mi(char) ::
+    eğer karakter_mi(char) != true ::
+        döndür false:
+    :
+    eğer char >= "A" ::
+        eğer char <= "Z" ::
+            döndür true:
+        :
+    :
+    döndür false:
+:
+
+
+fonksiyon harf_mi(char) ::
+    eğer kucuk_harf_mi(char) ::
+        döndür true:
+    :
+    eğer buyuk_harf_mi(char) ::
+        döndür true:
+    :
+    döndür false:
+:
+
+
+fonksiyon harf_rakam_mı(char) ::
+    eğer harf_mi(char) ::
+        döndür true:
+    :
+    eğer rakam_mı(char) ::
+        döndür true:
+    :
+    döndür false:
+:
+
+
+fonksiyon kes(text, start, end) ::
+    result = "":
+    i = start:
+    iken i < end ::
+        result = result + (text[i]):
+        i = i + 1:
+    :
+    döndür result:
+:
+
+fonksiyon baslar_mi(text, prefix) ::
+    eğer tür(text) != "string" ::
+        döndür false:
+    :
+    eğer tür(prefix) != "string" ::
+        döndür false:
+    :
+    eğer uzunluk(prefix) > uzunluk(text) ::
+        döndür false:
+    :
+    döndür kes(text, 0, uzunluk(prefix)) == prefix:
+:
+
+fonksiyon biter_mi(text, suffix) ::
+    eğer tür(text) != "string" ::
+        döndür false:
+    :
+    eğer tür(suffix) != "string" ::
+        döndür false:
+    :
+    eğer uzunluk(suffix) > uzunluk(text) ::
+        döndür false:
+    :
+    start = uzunluk(text) - uzunluk(suffix):
+
+    döndür kes(text, start, uzunluk(text)) == suffix:
+:
+
+startswith = baslar_mi:
+endswith = biter_mi:
+is_digit = rakam_mı:
+is_number = rakam_mı:
+rakam_mi = rakam_mı:
+is_alpha = harf_mi:
+is_alnum = harf_rakam_mı:
+harf_rakam_mi = harf_rakam_mı:
+substring = kes:

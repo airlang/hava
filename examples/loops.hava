@@ -4,7 +4,6 @@ döngü n içinde numbers ::
     yaz(n):
 :
 
-abc = 1:
 test = 0:
 while test != 5 ::
    yaz("hey"):
