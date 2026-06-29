@@ -1,0 +1,32 @@
+## Standard library examples ##
+text = "hava programming language":
+
+## substring / kes ##
+yaz(kes(text, 0, 4)):
+yaz(substring(text, 5, 16)):
+
+## startswith / baslar_mi ##
+yaz(baslar_mi(text, "hava")):
+yaz(startswith(text, "programming")):
+
+## endswith / biter_mi ##
+yaz(biter_mi(text, "language")):
+yaz(endswith(text, "hava")):
+
+## character helpers ##
+yaz(rakam_mı("5")):
+yaz(rakam_mi("a")):
+yaz(harf_mi("h")):
+yaz(is_alpha("7")):
+yaz(harf_rakam_mı("a")):
+yaz(harf_rakam_mi("9")):
+yaz(is_alnum("_")):
+
+
+## using stdlib helpers in a loop ##
+chars = ["h", "5", "a", "_", "9"]:
+döngü char içinde chars ::
+    eğer is_alnum(char) ::
+        yaz(char):
+    :
+:

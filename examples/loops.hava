@@ -1,11 +1,45 @@
-numbers = [10, 20, 30]:
+## Loop examples ##
 
-döngü n içinde numbers ::
-    yaz(n):
+## For loop over an array ##
+
+numbers = [1, 2, 3, 4]:
+
+döngü number içinde numbers ::
+    yaz(number):
 :
 
-test = 0:
-while test != 5 ::
-   yaz("hey"):
-   test = test + 1:
+## For loop over a string ##
+
+text = "hava":
+döngü char içinde text ::
+    yaz(char):
 :
+
+## While loop ##
+
+i = 0:
+iken i < 3 ::
+    yaz(i):
+    i += 1:
+:
+
+
+## Building a new array with a loop ##
+
+doubled = []:
+döngü number içinde numbers ::
+    ekle(doubled, number * 2):
+:
+
+yaz(doubled):
+
+## Loop inside a function ##
+fonksiyon count_to(limit) ::
+    i = 0:
+    iken i < limit ::
+        yaz(i):
+        i += 1:
+    :
+:
+
+count_to(3):
