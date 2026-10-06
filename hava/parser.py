@@ -143,6 +143,7 @@ class HavaParser(Parser):
         ('left', '+', '-'),
         ('left', '*', '/'),
         ('right', 'UMINUS'),
+        ('left', '[', ']'),
     )
 
     def __init__(self):

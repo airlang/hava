@@ -1,0 +1,7 @@
+fonksiyon esit_olmali(given, expected, description) ::
+    eğer given != expected::
+        yaz(description):
+    : değilse ::
+        yaz("test geçti: "+description):
+    :
+:

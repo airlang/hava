@@ -1,0 +1,3 @@
+esit_olmali("a"+"bc"[0],"ab","index process should happen before adding"):
+esit_olmali(("a" + "bc")[0],"a","index process should happen after parentheses"):
+esit_olmali(-[2][0],-2,"index process should happen before minus"):
