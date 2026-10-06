@@ -37,39 +37,44 @@ class HavaCompiler:
         return method(ast)
 
     def visit_program(self, ast):
-        statements = ast[1]
-        for statement in statements:
+        ast_info = {'statements': ast[1]}
+        for statement in ast_info["statements"]:
             self.visit(statement)
 
     def visit_block(self, ast):
-        statements = ast[1]
-        for statement in statements:
+        ast_info = {'statements': ast[1]}
+        for statement in ast_info["statements"]:
             self.visit(statement)
 
     def visit_num(self, ast):
-        self.emit(OpCode.LOAD_CONST, ast[1])
+        ast_info = {'const': ast[1]}
+        self.emit(OpCode.LOAD_CONST, ast_info["const"])
 
     def visit_str(self, ast):
-        self.emit(OpCode.LOAD_CONST, ast[1])
+        ast_info = {'const': ast[1]}
+        self.emit(OpCode.LOAD_CONST, ast_info["const"])
 
     def visit_var(self, ast):
-        name = ast[1]
-        self.emit(OpCode.LOAD_NAME, name)
+        ast_info = {'name': ast[1]}
+        self.emit(OpCode.LOAD_NAME, ast_info["name"])
 
     def visit_dict(self, ast):
-        for key, value in ast[1]:
+        ast_info = {'const': ast[1]}
+        for key, value in ast_info["const"]:
             self.visit(key)
             self.visit(value)
-        self.emit(OpCode.BUILD_DICT, len(ast[1]))
+        self.emit(OpCode.BUILD_DICT, len(ast_info["const"]))
 
     def visit_array(self, ast):
-        for elem in ast[1]:
+        ast_info = {'const': ast[1]}
+        for elem in ast_info["const"]:
             self.visit(elem)
-        self.emit(OpCode.BUILD_ARRAY, len(ast[1]))
+        self.emit(OpCode.BUILD_ARRAY, len(ast_info["const"]))
 
     def visit_index(self, ast):
-        self.visit(ast[1])
-        self.visit(ast[2])
+        ast_info = {'left_value': ast[1], "right_value": ast[2]}
+        self.visit(ast_info["left_value"])
+        self.visit(ast_info["right_value"])
         self.emit(OpCode.INDEX)
 
     def visit_index_assign(self, ast):
@@ -80,15 +85,14 @@ class HavaCompiler:
         self.emit(OpCode.INDEX_ASSIGN)
 
     def visit_assign(self, ast):
-        name = ast[1]
-        value = ast[2]
-        ensure_not_builtin_name(name)
-        self.visit(value)
-        self.emit(OpCode.STORE_NAME, name)
+        ast_info = {'name': ast[1], 'value': ast[2]}
+        ensure_not_builtin_name(ast_info["name"])
+        self.visit(ast_info["value"])
+        self.emit(OpCode.STORE_NAME, ast_info["name"])
 
     def visit_print(self, ast):
-        value = ast[1]
-        self.visit(value)
+        ast_info = {'value': ast[1]}
+        self.visit(ast_info["value"])
         self.emit(OpCode.PRINT)
 
     def visit_binary(self, ast):
@@ -104,17 +108,16 @@ class HavaCompiler:
             '>=': OpCode.GTE,
             '<=': OpCode.LTE,
         }
-        op = ast[1]
-        left = ast[2]
-        right = ast[3]
-        self.visit(left)
-        self.visit(right)
-        if op not in opcodes:
-            raise HavaCompilerError(f"Bilinmeyen binary operatör: {op}")
-        self.emit(opcodes[op])
+        ast_info = {'op':ast[1], 'left': ast[2], 'right': ast[3]}
+        self.visit(ast_info["left"])
+        self.visit(ast_info["right"])
+        if ast_info["op"] not in opcodes:
+            raise HavaCompilerError(f"Bilinmeyen binary operatör: {ast_info['op']}")
+        self.emit(opcodes[ast_info["op"]])
 
     def visit_bool(self, ast):
-        self.emit(OpCode.LOAD_CONST, ast[1])
+        ast_info = {'const': ast[1]}
+        self.emit(OpCode.LOAD_CONST, ast_info["const"])
 
     def visit_null(self, ast):
         self.emit(OpCode.LOAD_CONST, None)
@@ -131,6 +134,7 @@ class HavaCompiler:
 
     def visit_for_loop(self, ast):
         ast_info = {"iter_key": ast[1], "iter_items": ast[2], "block": ast[3]}
+        ensure_not_builtin_name(ast_info["iter_key"])
         self.visit(ast_info["iter_items"])
         self.emit(OpCode.GET_ITER)
         loop_start_index = len(self.instructions)
@@ -162,48 +166,51 @@ class HavaCompiler:
         self.patch(jump_to_end_index, end_index)
 
     def visit_fun_def(self, ast):
-        ensure_not_builtin_name(ast[1])
-        for param in ast[2]:
+        ast_info = {'name': ast[1], 'params': ast[2], 'block': ast[3]}
+        ensure_not_builtin_name(ast_info["name"])
+        for param in ast_info["params"]:
             ensure_not_builtin_name(param)
         outer_instructions = self.instructions
         self.instructions = []
-        self.visit(ast[3])
+        self.visit(ast_info["block"])
         self.emit(OpCode.LOAD_CONST, None)
         self.emit(OpCode.RETURN)
         function_instructions = self.instructions
         self.instructions = outer_instructions
-        function = HavaFunction(ast[2], function_instructions)
+        function = HavaFunction(ast_info["params"], function_instructions)
         self.emit(OpCode.LOAD_CONST, function)
-        self.emit(OpCode.STORE_NAME, ast[1])
+        self.emit(OpCode.STORE_NAME, ast_info["name"])
 
     def visit_fun_call(self, ast):
-        for arg in ast[2]:
+        ast_info = {'name': ast[1], 'args': ast[2]}
+        for arg in ast_info["args"]:
             self.visit(arg)
-        self.emit(OpCode.CALL, (ast[1], len(ast[2])))
+        self.emit(OpCode.CALL, (ast_info["name"], len(ast_info["args"])))
 
     def visit_expr_stmt(self, ast):
-        self.visit(ast[1])
+        ast_info = {'value': ast[1]}
+        self.visit(ast_info["value"])
         self.emit(OpCode.POP)
 
     def visit_return(self, ast):
-        self.visit(ast[1])
+        ast_info = {'value': ast[1]}
+        self.visit(ast_info["value"])
         self.emit(OpCode.RETURN)
 
     def visit_aug_assign(self, ast):
-        name = ast[1]
-        op = ast[2]
-        value = ast[3]
-        ensure_not_builtin_name(name)
-        self.emit(OpCode.LOAD_NAME, name)
-        self.visit(value)
-        if op == '+=':
+        ast_info = {'name': ast[1], 'op': ast[2], 'value': ast[3]}
+        ensure_not_builtin_name(ast_info["name"])
+        self.emit(OpCode.LOAD_NAME, ast_info["name"])
+        self.visit(ast_info["value"])
+        if ast_info["op"] == '+=':
             self.emit(OpCode.ADD)
-        elif op == '-=':
+        elif ast_info["op"] == '-=':
             self.emit(OpCode.SUB)
         else:
-            raise HavaCompilerError(f"Bilinmeyen atama operatörü: {op}")
-        self.emit(OpCode.STORE_NAME, name)
+            raise HavaCompilerError(f"Bilinmeyen atama operatörü: {ast_info['op']}")
+        self.emit(OpCode.STORE_NAME, ast_info["name"])
 
     def visit_neg(self, ast):
-        self.visit(ast[1])
+        ast_info = {'value': ast[1]}
+        self.visit(ast_info["value"])
         self.emit(OpCode.NEG)

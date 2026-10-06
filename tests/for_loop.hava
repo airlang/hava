@@ -1,0 +1,8 @@
+total = 0:
+
+döngü number içinde [1, 2, 3] ::
+    total += number:
+:
+
+esit_olmali(total, 6, "normal for loop sums values"):
+esit_olmali(uzunluk([1, 2, 3]), 3, "builtins remain callable after loop"):
